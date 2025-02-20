@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #camera {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            display: block;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>QR Code Scanner</h1>
+    <video id="camera" autoplay></video>
+    <div id="result">Scanning...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script>
+        // Инициализация камеры
+        const video = document.getElementById('camera');
+        const resultDiv = document.getElementById('result');
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = stream;
+                video.play();
+                scanQRCode();
+            } catch (error) {
+                resultDiv.textContent = 'Error accessing camera: ' + error.message;
+            }
+        }
+
+        // Сканирование QR-кода
+        function scanQRCode() {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            function tick() {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: 'dontInvert',
+                    });
+
+                    if (code) {
+                        resultDiv.textContent = 'QR Code detected: ' + code.data;
+                        sendToTelegramChat(code.data);
+                        return; // Остановить сканирование после обнаружения
+                    }
+                }
+                requestAnimationFrame(tick);
+            }
+
+            tick();
+        }
+
+        // Отправка данных в Telegram чат
+        function sendToTelegramChat(data) {
+            const botToken = 'YOUR_BOT_TOKEN'; // Замените на токен вашего бота
+            const chatId = Telegram.WebApp.initDataUnsafe.user?.id; // ID пользователя
+
+            if (!chatId) {
+                resultDiv.textContent = 'Error: User ID not found.';
+                return;
+            }
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: `Scanned QR Code: ${data}`,
+                }),
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.ok) {
+                    resultDiv.textContent = 'QR Code sent to chat!';
+                } else {
+                    resultDiv.textContent = 'Error sending message: ' + result.description;
+                }
+            })
+            .catch(error => {
+                resultDiv.textContent = 'Error: ' + error.message;
+            });
+        }
+
+        // Запуск камеры при загрузке страницы
+        startCamera();
+    </script>
+</body>
+</html>
