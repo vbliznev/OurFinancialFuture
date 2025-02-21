@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Scanner</title>
+    <title>QR Code Scannerv1</title>
     <style>
         body, html {
             margin: 0;
@@ -46,6 +46,10 @@
         // Проверка поддержки камеры
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             resultDiv.textContent = 'Ваше устройство не поддерживает доступ к камере.';
+            const openInBrowser = confirm('Камера недоступна в Telegram. Открыть в браузере?');
+            if (openInBrowser) {
+                window.open('https://your-mini-app-url.com', '_blank');
+            }
         } else {
             startCamera();
         }
@@ -53,7 +57,6 @@
         // Запуск камеры
         async function startCamera() {
             try {
-                // Используем заднюю камеру (environment)
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: 'environment', // Задняя камера
@@ -65,6 +68,7 @@
                 video.play();
                 scanQRCode();
             } catch (error) {
+                console.error('Ошибка доступа к камере:', error);
                 resultDiv.textContent = 'Ошибка доступа к камере: ' + error.message;
             }
         }
