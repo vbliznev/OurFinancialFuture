@@ -1,136 +1,288 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Scannerv1</title>
+    <title>Финансовый калькулятор</title>
     <style>
-        body, html {
+        /* Основные стили */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            height: 100%;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        #camera {
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
+            max-width: 600px;
         }
-        #result {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 18px;
+
+        h1 {
             text-align: center;
-            z-index: 10;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .slider {
+            margin: 1.5rem 0;
+        }
+
+        .slider label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #34495e;
+        }
+
+        .slider input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .slider input[type="range"]:hover {
+            opacity: 1;
+        }
+
+        .slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .red-slider input[type="range"]::-webkit-slider-thumb {
+            background: #e74c3c;
+        }
+
+        .red-slider input[type="range"]::-moz-range-thumb {
+            background: #e74c3c;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            color: #333;
+            background: #f9f9f9;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+
+        .warning {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background: #f8d7da;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+            text-align: center;
+        }
+
+        .red-slider {
+            accent-color: #e74c3c;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <video id="camera" autoplay></video>
-    <div id="result">Scanning...</div>
+<div class="container">
+    <h1>Финансовый калькулятор</h1>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-    <script>
-        const video = document.getElementById('camera');
-        const resultDiv = document.getElementById('result');
+    <div class="slider">
+        <label for="rent">Цена аренды квартиры: <span id="rentValue">100000</span> ₽</label>
+        <input type="range" id="rent" min="80000" max="170000" value="100000" step="1000">
+    </div>
 
-        // Проверка поддержки камеры
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            resultDiv.textContent = 'Ваше устройство не поддерживает доступ к камере.';
-            const openInBrowser = confirm('Камера недоступна в Telegram. Открыть в браузере?');
-            if (openInBrowser) {
-                window.open('https://your-mini-app-url.com', '_blank');
-            }
+    <div class="slider">
+        <label for="adultPocketMoney">Карманные деньги наши: <span id="adultPocketMoneyValue">4250</span> ₽</label>
+        <input type="range" id="adultPocketMoney" min="2000" max="10000" value="4250" step="100">
+    </div>
+
+    <div class="slider">
+        <label for="kidsPocketMoney">Карманные деньги детей: <span id="kidsPocketMoneyValue">1700</span> ₽</label>
+        <input type="range" id="kidsPocketMoney" min="500" max="10000" value="1700" step="50">
+    </div>
+
+    <div class="slider">
+        <label for="vacationType">Тип отпуска:</label>
+        <select id="vacationType">
+            <option value="6500">Путешествие на машине</option>
+            <option value="13500">Путешествие на поезде</option>
+            <option value="20000">Путешествие на самолёте</option>
+            <option value="30000">Путешествие на самолёте за границу 3*</option>
+            <option value="50000">Путешествие на самолёте за границу 5*</option>
+        </select>
+    </div>
+
+    <div class="slider">
+        <label for="savings">Сколько откладываем: <span id="savingsValue">10000</span> ₽</label>
+        <input type="range" id="savings" min="10000" max="100000" value="10000" step="500">
+    </div>
+
+    <div class="result">
+        Остаток: <span id="remainingAmount">0</span> ₽
+    </div>
+
+    <div class="result">
+        Выхода на пенсию через <span id="retirementDate">0</span> лет
+    </div>
+
+    <div class="result warning" id="warningMessage" style="display: none;">
+        Надо получать в месяц больше на <span id="deficitAmount">0</span> ₽
+    </div>
+
+    <div class="footer">
+        Сделано с ❤️ к нашему будущему
+    </div>
+</div>
+
+<script>
+    const rentSlider = document.getElementById('rent');
+    const adultPocketMoneySlider = document.getElementById('adultPocketMoney');
+    const kidsPocketMoneySlider = document.getElementById('kidsPocketMoney');
+    const savingsSlider = document.getElementById('savings');
+
+    const rentValue = document.getElementById('rentValue');
+    const adultPocketMoneyValue = document.getElementById('adultPocketMoneyValue');
+    const kidsPocketMoneyValue = document.getElementById('kidsPocketMoneyValue');
+    const savingsValue = document.getElementById('savingsValue');
+    const remainingAmount = document.getElementById('remainingAmount');
+    const retirementDate = document.getElementById('retirementDate');
+    const warningMessage = document.getElementById('warningMessage');
+    const deficitAmount = document.getElementById('deficitAmount');
+
+    const totalMoney = 243000; // Общая сумма свободных денег в месяц
+
+    // Получаем все ползунки
+    const sliders = [rentSlider, adultPocketMoneySlider, kidsPocketMoneySlider, savingsSlider];
+
+    rentSlider.oninput = function() {
+        rentValue.textContent = this.value;
+        updateValues();
+    };
+
+    adultPocketMoneySlider.oninput = function() {
+        adultPocketMoneyValue.textContent = this.value;
+        updateValues();
+    };
+
+    kidsPocketMoneySlider.oninput = function() {
+        kidsPocketMoneyValue.textContent = this.value;
+        updateValues();
+    };
+
+    savingsSlider.oninput = function() {
+        savingsValue.textContent = this.value;
+        updateValues();
+    };
+
+    const vacationType = document.getElementById('vacationType');
+
+    function updateValues() {
+        // Получаем значения из ползунков и выпадающего списка
+        const rent = parseInt(rentSlider.value);
+        const adultPocketMoney = parseInt(adultPocketMoneySlider.value);
+        const kidsPocketMoney = parseInt(kidsPocketMoneySlider.value);
+        const savings = parseInt(savingsSlider.value);
+        const vacationCost = parseInt(vacationType.value); // Стоимость отпуска
+
+        // Рассчитываем общий расход
+        const totalExpenses = 125000 + rent + (adultPocketMoney + kidsPocketMoney) * 8 + vacationCost;
+
+        // Рассчитываем остаток
+        const remaining = totalMoney - (rent + (adultPocketMoney * 2 * 4) + (kidsPocketMoney * 2 * 4) + savings + vacationCost);
+        remainingAmount.textContent = remaining < 0 ? 0 : remaining; // Остаток не может быть отрицательным
+
+        // Рассчитываем дату выхода на пенсию
+        const n = Math.log((totalExpenses * 12) / (savings * 12) + 1) / Math.log(1 + 0.10);
+        retirementDate.textContent = isFinite(n) ? Math.ceil(n) : "∞"; // Если n не конечное, выводим "∞"
+
+        // Проверяем, если остаток равен 0
+        if (remaining <= 0) {
+            // Показываем предупреждение
+            warningMessage.style.display = 'block';
+            deficitAmount.textContent = Math.abs(remaining); // Показываем, сколько не хватает
+
+            // Делаем ползунки красными
+            sliders.forEach(slider => {
+                slider.classList.add('red-slider');
+            });
         } else {
-            startCamera();
-        }
+            // Скрываем предупреждение
+            warningMessage.style.display = 'none';
 
-        // Запуск камеры
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: 'environment', // Задняя камера
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 }
-                    }
-                });
-                video.srcObject = stream;
-                video.play();
-                scanQRCode();
-            } catch (error) {
-                console.error('Ошибка доступа к камере:', error);
-                resultDiv.textContent = 'Ошибка доступа к камере: ' + error.message;
-            }
-        }
-
-        // Сканирование QR-кода
-        function scanQRCode() {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-
-            function tick() {
-                if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                        inversionAttempts: 'dontInvert',
-                    });
-
-                    if (code) {
-                        resultDiv.textContent = 'QR Code detected: ' + code.data;
-                        sendToTelegramChat(code.data);
-                        return; // Остановить сканирование после обнаружения
-                    }
-                }
-                requestAnimationFrame(tick);
-            }
-
-            tick();
-        }
-
-        // Отправка данных в Telegram чат
-        function sendToTelegramChat(data) {
-            const botToken = 'YOUR_BOT_TOKEN'; // Замените на токен вашего бота
-            const chatId = Telegram.WebApp.initDataUnsafe.user?.id; // ID пользователя
-
-            if (!chatId) {
-                resultDiv.textContent = 'Ошибка: ID пользователя не найден.';
-                return;
-            }
-
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: `Scanned QR Code: ${data}`,
-                }),
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.ok) {
-                    resultDiv.textContent = 'QR Code отправлен в чат!';
-                } else {
-                    resultDiv.textContent = 'Ошибка отправки сообщения: ' + result.description;
-                }
-            })
-            .catch(error => {
-                resultDiv.textContent = 'Ошибка: ' + error.message;
+            // Убираем красный цвет с ползунков
+            sliders.forEach(slider => {
+                slider.classList.remove('red-slider');
             });
         }
-    </script>
+    }
+
+    // Добавляем обработчик изменения выбора отпуска
+    vacationType.onchange = updateValues;
+
+    // Инициализируем значения при загрузке
+    updateValues();
+</script>
 </body>
 </html>
