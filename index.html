@@ -3,18 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Финансовый калькулятор</title>
+    <title>Финансовый калькулятор для семьи</title>
     <style>
-        /* Основные стили */
+        :root {
+            --primary: #3498db;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
             color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
         }
 
@@ -23,108 +27,118 @@
             padding: 2rem;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            width: 100%;
             max-width: 600px;
+            margin: 0 auto;
         }
 
         h1 {
             text-align: center;
-            color: #2c3e50;
+            color: var(--dark);
             margin-bottom: 1.5rem;
             font-size: 2rem;
         }
 
-        .slider {
+        .input-group {
             margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f9f9f9;
+            border-radius: 10px;
+            transition: all 0.3s ease;
         }
 
-        .slider label {
+        .input-group:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-group label {
             display: block;
             font-weight: bold;
             margin-bottom: 0.5rem;
-            color: #34495e;
+            color: var(--dark);
         }
 
-        .slider input[type="range"] {
+        .input-group input[type="range"] {
             width: 100%;
             -webkit-appearance: none;
-            appearance: none;
             height: 8px;
             background: #e0e0e0;
             border-radius: 5px;
             outline: none;
             opacity: 0.7;
             transition: opacity 0.2s;
+            margin-top: 10px;
         }
 
-        .slider input[type="range"]:hover {
+        .input-group input[type="range"]:hover {
             opacity: 1;
         }
 
-        .slider input[type="range"]::-webkit-slider-thumb {
+        .input-group input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            appearance: none;
             width: 20px;
             height: 20px;
-            background: #3498db;
+            background: var(--primary);
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
-        .slider input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: #3498db;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        .input-group.red-slider input[type="range"]::-webkit-slider-thumb {
+            background: var(--danger);
         }
 
-        .red-slider input[type="range"]::-webkit-slider-thumb {
-            background: #e74c3c;
-        }
-
-        .red-slider input[type="range"]::-moz-range-thumb {
-            background: #e74c3c;
+        .value-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin-top: 5px;
         }
 
         select {
             width: 100%;
-            padding: 0.5rem;
-            border-radius: 5px;
+            padding: 0.8rem;
+            border-radius: 8px;
             border: 1px solid #ddd;
             font-size: 1rem;
             color: #333;
-            background: #f9f9f9;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            background: white;
+            transition: all 0.3s;
+            margin-top: 10px;
         }
 
         select:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
 
-        .result {
-            margin-top: 1.5rem;
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary);
+        }
+
+        .result-card h3 {
+            margin-top: 0;
+            color: var(--dark);
+        }
+
+        .result-value {
+            font-size: 1.5rem;
             font-weight: bold;
-            font-size: 1.1rem;
-            color: #2c3e50;
+            color: var(--primary);
         }
 
         .warning {
-            color: #e74c3c;
-            font-weight: bold;
-            margin-top: 1rem;
-            padding: 0.5rem;
-            background: #f8d7da;
-            border-radius: 5px;
-            border: 1px solid #f5c6cb;
-            text-align: center;
+            background-color: #f8d7da;
+            border-left: 4px solid var(--danger);
+            color: var(--danger);
         }
 
-        .red-slider {
-            accent-color: #e74c3c;
+        .warning .result-value {
+            color: var(--danger);
         }
 
         .footer {
@@ -134,74 +148,85 @@
             font-size: 0.9rem;
         }
 
-        .footer a {
-            color: #3498db;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
+        .red-slider input[type="range"] {
+            accent-color: var(--danger);
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Финансовый калькулятор</h1>
+    <h1>Наш семейный бюджет</h1>
 
-    <div class="slider">
-        <label for="rent">Цена аренды квартиры: <span id="rentValue">100000</span> ₽</label>
-        <input type="range" id="rent" min="80000" max="170000" value="100000" step="1000">
+    <div class="input-group">
+        <label for="salary">Моя зарплата:</label>
+        <input type="range" id="salary" min="100000" max="500000" value="243000" step="1000">
+        <div class="value-display"><span id="salaryValue">243000</span> ₽</div>
     </div>
 
-    <div class="slider">
-        <label for="adultPocketMoney">Карманные деньги наши: <span id="adultPocketMoneyValue">4250</span> ₽</label>
-        <input type="range" id="adultPocketMoney" min="2000" max="10000" value="4250" step="100">
+    <div class="input-group">
+        <label for="rent">Аренда квартиры:</label>
+        <input type="range" id="rent" min="50000" max="170000" value="100000" step="1000">
+        <div class="value-display"><span id="rentValue">100000</span> ₽</div>
     </div>
 
-    <div class="slider">
-        <label for="kidsPocketMoney">Карманные деньги детей: <span id="kidsPocketMoneyValue">1700</span> ₽</label>
-        <input type="range" id="kidsPocketMoney" min="500" max="10000" value="1700" step="50">
+    <div class="input-group">
+        <label for="adultPocketMoney">Наши карманные деньги:</label>
+        <input type="range" id="adultPocketMoney" min="5000" max="10000" value="5000" step="100">
+        <div class="value-display"><span id="adultPocketMoneyValue">5000</span> ₽</div>
     </div>
 
-    <div class="slider">
+    <div class="input-group">
+        <label for="kidsPocketMoney">Карманные деньги детей:</label>
+        <input type="range" id="kidsPocketMoney" min="500" max="2000" value="850" step="50">
+        <div class="value-display"><span id="kidsPocketMoneyValue">850</span> ₽</div>
+    </div>
+
+    <div class="input-group">
         <label for="vacationType">Тип отпуска:</label>
         <select id="vacationType">
-            <option value="6500">Путешествие на машине</option>
-            <option value="13500">Путешествие на поезде</option>
-            <option value="20000">Путешествие на самолёте</option>
-            <option value="30000">Путешествие на самолёте за границу 3*</option>
-            <option value="50000">Путешествие на самолёте за границу 5*</option>
+            <option value="6500">Путешествие на машине (6 500 ₽/мес)</option>
+            <option value="13500">Путешествие на поезде (13 500 ₽/мес)</option>
+            <option value="20000">Путешествие на самолёте (20 000 ₽/мес)</option>
+            <option value="30000">Путешествие за границу 3* (30 000 ₽/мес)</option>
+            <option value="50000">Путешествие за границу 5* (50 000 ₽/мес)</option>
         </select>
     </div>
 
-    <div class="slider">
-        <label for="savings">Сколько откладываем: <span id="savingsValue">10000</span> ₽</label>
+    <div class="input-group">
+        <label for="savings">Ежемесячные накопления:</label>
         <input type="range" id="savings" min="10000" max="100000" value="10000" step="500">
+        <div class="value-display"><span id="savingsValue">10000</span> ₽</div>
     </div>
 
-    <div class="result">
-        Остаток: <span id="remainingAmount">0</span> ₽
+    <div class="result-card">
+        <h3>Ежемесячный остаток:</h3>
+        <div class="result-value"><span id="remainingAmount">0</span> ₽</div>
     </div>
 
-    <div class="result">
-        Выхода на пенсию через <span id="retirementDate">0</span> лет
+    <div class="result-card">
+        <h3>Выход на пенсию через:</h3>
+        <div class="result-value"><span id="retirementDate">0</span> лет</div>
     </div>
 
-    <div class="result warning" id="warningMessage" style="display: none;">
-        Надо получать в месяц больше на <span id="deficitAmount">0</span> ₽
+    <div class="result-card warning" id="warningMessage" style="display: none;">
+        <h3>Внимание!</h3>
+        <p>Чтобы покрыть все расходы, вам нужно зарабатывать на <span class="result-value"><span id="deficitAmount">0</span> ₽</span> больше каждый месяц.</p>
     </div>
 
     <div class="footer">
-        Сделано с ❤️ к нашему будущему
+        Финансовый калькулятор для семьи | Обновлено: 2023
     </div>
 </div>
 
 <script>
+    // Получаем элементы DOM
+    const salarySlider = document.getElementById('salary');
     const rentSlider = document.getElementById('rent');
     const adultPocketMoneySlider = document.getElementById('adultPocketMoney');
     const kidsPocketMoneySlider = document.getElementById('kidsPocketMoney');
     const savingsSlider = document.getElementById('savings');
 
+    const salaryValue = document.getElementById('salaryValue');
     const rentValue = document.getElementById('rentValue');
     const adultPocketMoneyValue = document.getElementById('adultPocketMoneyValue');
     const kidsPocketMoneyValue = document.getElementById('kidsPocketMoneyValue');
@@ -211,78 +236,76 @@
     const warningMessage = document.getElementById('warningMessage');
     const deficitAmount = document.getElementById('deficitAmount');
 
-    const totalMoney = 243000; // Общая сумма свободных денег в месяц
+    const vacationType = document.getElementById('vacationType');
+    const sliders = [salarySlider, rentSlider, adultPocketMoneySlider, kidsPocketMoneySlider, savingsSlider];
 
-    // Получаем все ползунки
-    const sliders = [rentSlider, adultPocketMoneySlider, kidsPocketMoneySlider, savingsSlider];
+    // Обработчики событий для ползунков
+    salarySlider.oninput = function() {
+        salaryValue.textContent = this.value;
+        updateCalculations();
+    };
 
     rentSlider.oninput = function() {
         rentValue.textContent = this.value;
-        updateValues();
+        updateCalculations();
     };
 
     adultPocketMoneySlider.oninput = function() {
         adultPocketMoneyValue.textContent = this.value;
-        updateValues();
+        updateCalculations();
     };
 
     kidsPocketMoneySlider.oninput = function() {
         kidsPocketMoneyValue.textContent = this.value;
-        updateValues();
+        updateCalculations();
     };
 
     savingsSlider.oninput = function() {
         savingsValue.textContent = this.value;
-        updateValues();
+        updateCalculations();
     };
 
-    const vacationType = document.getElementById('vacationType');
+    vacationType.onchange = updateCalculations;
 
-    function updateValues() {
-        // Получаем значения из ползунков и выпадающего списка
+    function updateCalculations() {
+        // Получаем текущие значения
+        const salary = parseInt(salarySlider.value);
         const rent = parseInt(rentSlider.value);
         const adultPocketMoney = parseInt(adultPocketMoneySlider.value);
         const kidsPocketMoney = parseInt(kidsPocketMoneySlider.value);
         const savings = parseInt(savingsSlider.value);
-        const vacationCost = parseInt(vacationType.value); // Стоимость отпуска
+        const vacationCost = parseInt(vacationType.value);
 
-        // Рассчитываем общий расход
+        // Рассчитываем общие расходы
         const totalExpenses = 125000 + rent + (adultPocketMoney + kidsPocketMoney) * 8 + vacationCost;
 
         // Рассчитываем остаток
-        const remaining = totalMoney - (rent + (adultPocketMoney * 2 * 4) + (kidsPocketMoney * 2 * 4) + savings + vacationCost);
-        remainingAmount.textContent = remaining < 0 ? 0 : remaining; // Остаток не может быть отрицательным
+        const remaining = salary - (rent + (adultPocketMoney * 2 * 4) + (kidsPocketMoney * 2 * 4) + savings + vacationCost);
+        remainingAmount.textContent = remaining < 0 ? 0 : remaining;
 
-        // Рассчитываем дату выхода на пенсию
+        // Рассчитываем срок выхода на пенсию
         const n = Math.log((totalExpenses * 12) / (savings * 12) + 1) / Math.log(1 + 0.10);
-        retirementDate.textContent = isFinite(n) ? Math.ceil(n) : "∞"; // Если n не конечное, выводим "∞"
+        retirementDate.textContent = isFinite(n) ? Math.ceil(n) : "∞";
 
-        // Проверяем, если остаток равен 0
+        // Проверяем дефицит бюджета
         if (remaining <= 0) {
-            // Показываем предупреждение
             warningMessage.style.display = 'block';
-            deficitAmount.textContent = Math.abs(remaining); // Показываем, сколько не хватает
-
-            // Делаем ползунки красными
+            deficitAmount.textContent = Math.abs(remaining);
+            
+            // Подсвечиваем проблемные ползунки
             sliders.forEach(slider => {
                 slider.classList.add('red-slider');
             });
         } else {
-            // Скрываем предупреждение
             warningMessage.style.display = 'none';
-
-            // Убираем красный цвет с ползунков
             sliders.forEach(slider => {
                 slider.classList.remove('red-slider');
             });
         }
     }
 
-    // Добавляем обработчик изменения выбора отпуска
-    vacationType.onchange = updateValues;
-
-    // Инициализируем значения при загрузке
-    updateValues();
+    // Инициализация при загрузке
+    updateCalculations();
 </script>
 </body>
 </html>
